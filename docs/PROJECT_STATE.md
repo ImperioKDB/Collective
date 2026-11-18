@@ -110,9 +110,7 @@ P0.2.1 documentary investigation is complete. No application code, architecture 
 
 ## 7. Next task
 
-**Next task after founder approval: P0.2 — Architecture evaluation and decision records. Not yet approved or started.**
-
-Do not begin P0.2 until the founder explicitly approves P0.1.
+**Next task:** Founder review of P0.2.1 and explicit decision on whether to revise the MVP proof, change the ₦0 constraint, or authorise a bounded hands-on validation. Do not start P0.2.2 or implement the application until the founder explicitly approves the next step.
 
 ## 8. Document index (interim, authoritative)
 
