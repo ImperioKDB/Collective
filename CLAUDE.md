@@ -58,7 +58,8 @@ Use these labels in documents:
 - The founder develops from an **Android device and cloud tools**. Do not assume a local computer, local Docker, local terminal or local database.
 - All workflows must work through GitHub and cloud services: repository changes via GitHub, checks in cloud CI, automated deployment to preview and production.
 - Prefer instructions that can be executed from a mobile browser or a cloud notebook.
-- Low-cost infrastructure first. Record any recurring cost a decision introduces.
+- Initial development and the initial MVP operate within a founder-confirmed **₦0 monthly budget** for platform infrastructure and managed AI/API spend. Treat this as a binding constraint, not a preference. Do not introduce paid services, subscriptions, dependencies or infrastructure silently. Record costs and distinguish genuinely free operator access from user-paid BYOK, temporary credits/promotions and paid/unavailable services.
+- Low-cost infrastructure first. Record any recurring cost a decision introduces. If a capability cannot be delivered within ₦0, mark it blocked or deferred, identify a feasible free alternative where one exists, and design graceful quota handling: pause safely, report the limitation, preserve progress where possible and allow resumption. Do not make permanent architectural assumptions from temporary free-tier limits or promotional credits.
 
 ## 5. Documentation conventions
 

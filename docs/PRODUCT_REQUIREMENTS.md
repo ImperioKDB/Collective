@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | Document ID | DOC-PRS |
-| Version | 0.1 (draft) |
+| Version | 0.1 (remediated draft) |
 | Phase / task | Phase 0 / P0.1 |
-| Status | DRAFT - pending founder review. Not yet approved. |
+| Status | REMEDIATED DRAFT - pending founder approval. Not yet approved. |
 | Last updated | 2026-11-18 |
 | Supersedes | None (first version) |
 | Authority | Product requirements. Architecture belongs to P0.2 and later; this document does not select technologies. |
@@ -90,7 +90,7 @@ Users who rely on AI today typically face these problems:
 | UC-05 | Strategy | "Evaluate three market-entry options with risks." | Research, critique | MVP-compatible |
 | UC-06 | Local workflows | "Reorganise the files in this folder." | Local runner | P2 |
 
-**[RECOMMENDATION]** Use UC-01 (or UC-05) as the MVP reference scenario because it needs no code execution, no local access and no external side effects. See OQ-001.
+**[RECOMMENDATION]** OQ-001 remains open because UC-01's sourced brief requires retrieval and source attribution, while UC-05 can be demonstrated using supplied or otherwise available information. Option B is more feasible under the initial ₦0 constraint, but no scenario is approved yet.
 
 ## 5. Core product principles
 
@@ -128,9 +128,9 @@ Users who rely on AI today typically face these problems:
 
 | ID | Requirement | Pri | Cat | Acceptance criterion |
 |---|---|---|---|---|
-| NFR-001 | **Durability.** Accepted runs survive backend or worker restart and resume from the last durable checkpoint without re-running completed tasks. | P0 | Non-functional | Test: terminate the worker mid-run. The run resumes and completes; the trace shows each task completed exactly once. |
+| NFR-001 | **Durability.** Accepted runs survive backend or worker restart and resume from the last durable checkpoint without re-running completed tasks. | P0 | Non-functional | Test: terminate the worker mid-run. The run resumes and completes; the trace shows no duplicate committed outputs and no invalid state transition. Delivery may be repeated; completion is made idempotent. |
 | NFR-002 | **Cloud-only developability.** Build, test and deploy are possible with no local computer, through GitHub and cloud CI/CD. | P0 | Infrastructure | A change committed from a mobile device triggers automated checks and a preview or staging deployment with no local step. |
-| NFR-003 | **Cost ceiling for infrastructure.** Fixed monthly infrastructure cost is documented and kept within a founder-set ceiling. | P0 | Infrastructure | Cost table exists and total is at or below the ceiling set in OQ-004. |
+| NFR-003 | **Cost ceiling for infrastructure.** Fixed monthly infrastructure cost is documented and kept within the founder-confirmed initial ceiling of ₦0. | P0 | Infrastructure | Cost table exists and initial platform infrastructure cost is ₦0; any later change requires an explicit founder decision. |
 | NFR-004 | **Reproducible environments.** Dependencies pinned; the same commit yields the same build. | P1 | Infrastructure | Rebuild of a tagged commit produces identical dependency versions (lock files committed). |
 | NFR-005 | **API latency (non-model endpoints).** | P1 | Non-functional | p95 under 500 ms *(prov.)* at 20 concurrent users *(prov.)* in a load test. |
 | NFR-006 | **Concurrency.** The platform runs multiple runs concurrently. | P1 | Non-functional | At least 5 concurrent runs *(prov.)* complete without cross-run interference in a test. |
@@ -209,11 +209,11 @@ Users who rely on AI today typically face these problems:
 |---|---|---|---|---|
 | MDL-001 | A provider-neutral internal contract covers messages, tool calls, structured output requests, streaming (if used) and usage reporting. | P0 | Infrastructure | The same role runs on two provider adapters with zero role-level code changes. |
 | MDL-002 | At least two independent AI providers are integrated through adapters. | P0 | Infrastructure | A single run's trace shows calls to at least two providers. |
-| MDL-003 | A model registry holds capability and price metadata (context limit, structured-output support, tool-use support, price, status) as data, not code. | P0 | Infrastructure | Adding a model entry requires no code change to roles or orchestration. |
+| MDL-003 | A model registry holds capability and price metadata (context limit, structured-output support, tool-use support, price, status) as data, not code. | P1 | Infrastructure | Adding a model entry requires no code change to roles or orchestration. |
 | MDL-004 | Role-to-model assignment is configuration. | P0 | Functional | Changing a role's assigned model changes the model used in the next run with no deployment. |
 | MDL-005 | Provider errors trigger bounded retry with backoff. | P0 | Non-functional | Simulated provider error: retry count and backoff observed; run fails cleanly if exhausted. |
 | MDL-006 | Per-call usage capture: tokens, estimated cost, latency, model, provider. | P0 | Functional | 100 % of model calls in a test run have a usage record. |
-| MDL-007 | Managed access: the platform holds provider keys and meters usage per workspace. **MVP uses operator-held keys for invited users only.** | P0 | Commercial | Invited MVP users can run without supplying a key; usage attributed per workspace. |
+| MDL-007 | Managed access: the platform may hold provider keys and meter usage per workspace, subject to an approved funding model. | P1 | Commercial | In a later managed-access release, invited users can run without supplying a key and usage is attributed per workspace. |
 | MDL-008 | Bring your own key: users supply provider keys; keys are validated on save and never shown again. | P1 | Security | Key is stored encrypted; API never returns it; a run uses it when configured. |
 | MDL-009 | Fallback to an alternate model when the assigned model is unavailable. | P1 | Non-functional | With provider A disabled in test, the task completes using the configured alternate. |
 | MDL-010 | Policy-based role-to-model routing using capability, reliability, cost, speed and context limits. | P1 | Functional | Given a task requirement set, the router selects deterministically and logs its reasoning inputs. |
@@ -222,7 +222,7 @@ Users who rely on AI today typically face these problems:
 | MDL-013 | Model deprecation tracking and alerts. | P2 | Non-functional | Registry status flag triggers an alert when a used model is marked deprecated. |
 | MDL-014 | Self-hosted or local models via a standard endpoint. | P2 | Infrastructure | A local endpoint is usable through the same contract (MDL-001). |
 
-**Note.** MDL-007 and MDL-008 reorder the confirmed "managed and BYOK" decision for the MVP only. This sequencing is a recommendation requiring approval (see OQ-002).
+**Note.** Managed access and BYOK remain confirmed long-term product capabilities. Their MVP sequencing is unresolved (OQ-002). The founder's initial ₦0 budget means managed access cannot be assumed to be free; BYOK may shift provider charges to the key owner but is also not inherently free.
 
 ## 12. Agent collaboration requirements
 
@@ -258,7 +258,7 @@ Users who rely on AI today typically face these problems:
 | ID | Requirement | Pri | Cat | Acceptance criterion |
 |---|---|---|---|---|
 | EXE-001 | Runs execute in backend workers independent of any client session. | P0 | Infrastructure | See FR-005. |
-| EXE-002 | Work is dispatched through a durable queue with at-least-once delivery; task execution is idempotent. | P0 | Infrastructure | Test: duplicate delivery of a task message does not produce duplicate outputs or double billing. |
+| EXE-002 | Work is dispatched through a durable queue with at-least-once delivery; task execution is idempotent. | P0 | Infrastructure | Test: duplicate delivery of a task message is tolerated, does not create duplicate committed outputs or double usage accounting, and cannot cause invalid state transitions. Exactly-once execution is not promised. |
 | EXE-003 | **MVP performs no code execution and no external side effects.** | P0 | Security | Review of MVP tool list confirms none can execute code or change external state. |
 | EXE-004 | Any code-execution capability runs in an isolated sandbox: no access to platform secrets, restricted network egress, CPU, memory and time limits, destroyed after use. | P1 | Security | Sandbox test suite: secret access, unrestricted egress and resource exhaustion attempts all fail. |
 | EXE-005 | Per-workspace concurrency limits. | P1 | Infrastructure | Limit enforced; excess runs queue. |
@@ -341,6 +341,8 @@ Users who rely on AI today typically face these problems:
 
 Prove the central proposition: **one objective, handed to Collective, produces a verified outcome through coordinating agents on more than one AI provider, with no manual transfer of prompts or context by the user.**
 
+**Critical unresolved feasibility dependency [ASSUMPTION]:** MDL-002 requires at least two independent AI providers. The initial budget is ₦0, BYOK is excluded from the proposed MVP, and no genuinely free managed-access solution has been validated. P0.2 must establish whether two genuinely free providers can support the proposed MVP. If it cannot establish this, the founder must decide whether to revise the MVP proof; paid access must not be introduced silently.
+
 ### 19.2 Assessment of the proposed proof
 
 | Proof step | Maps to | Assessment |
@@ -363,11 +365,11 @@ Prove the central proposition: **one objective, handed to Collective, produces a
 
 ### 19.3 Smallest implementation that proves the proposition **[RECOMMENDATION]**
 
-- One reference scenario (UC-01 or UC-05; OQ-001).
-- Roles: Director, Researcher, Writer or Analyst, Critic. Researcher and Writer on different providers; Critic on a provider different from the deliverable's producer.
+- One reference scenario, selected through OQ-001. **Option A:** sourced research, which requires retrieval and source attribution. **Option B:** planning/synthesis using supplied or otherwise available information, without promising live sourced research.
+- Roles: Director, at least two specialists, and Critic. Specialists use different providers where access is available; Critic uses a provider different from the deliverable's producer where available.
 - Sequential task execution; one worker; durable state; no code execution; no external side effects (EXE-003).
-- Model calls only. **Optional late addition:** one read-only retrieval tool through MCP (P1, ASM-005).
-- Operator-held provider keys; invite-only; hard run budget.
+- Retrieval is required only if Option A is approved; otherwise supplied or otherwise available information is sufficient for the proof.
+- Invite-only; hard run budget; BYOK is excluded from the proposed MVP. No free managed-access solution has been validated, so P0.2 must establish whether two genuinely free providers can support the proof. No paid access is assumed or may be introduced silently.
 - Minimal UI: objective form, plan view, run timeline and message log, report view.
 - No billing, no BYOK, no local runner, no external agents, no semantic memory.
 
@@ -381,7 +383,7 @@ Prove the central proposition: **one objective, handed to Collective, produces a
 
 ### 19.5 MVP requirement summary
 
-MVP = all **P0** requirements in this document. P0 count by section is reported in `docs/PROJECT_STATE.md`. Nothing else is MVP unless the founder promotes it.
+MVP = all **retained P0** requirements in this document. After remediation there are 56 P0 requirements, 61 P1, 19 P2 and 6 P3 requirements. MDL-003 and MDL-007 were moved to P1 because they are not essential to the minimum proof and MDL-007 would otherwise imply funded managed access inconsistent with the initial ₦0 constraint. Nothing else is MVP unless the founder promotes it.
 
 ## 20. Explicitly excluded features
 
@@ -390,7 +392,7 @@ MVP = all **P0** requirements in this document. P0 count by section is reported 
 | EX-001 | Code execution and sandboxes | Security cost; not needed for the proof | P1 |
 | EX-002 | Local runner and local execution | No local test environment; not needed for the proof | P2 |
 | EX-003 | External agents (A2A) | Needs stable protocol and trust model | P2 |
-| EX-004 | BYOK | Operator keys suffice for invite-only MVP (pending OQ-002) | P1 |
+| EX-004 | BYOK as a required MVP capability | Access sequencing remains unresolved; user-paid BYOK is not equivalent to free managed access (OQ-002) | P1 |
 | EX-005 | Billing and plans | Invite-only MVP | P1 |
 | EX-006 | Actions with external side effects (sending messages, payments, deployments) | Requires A1 approval gates | P1 |
 | EX-007 | Team collaboration and role matrix beyond Owner | Single-user workspaces suffice | P1 |
@@ -412,7 +414,7 @@ None of these has been validated. No implementation exists.
 | AC-002 | The trace of the reference run shows at least two providers and at least four distinct agent instances. | MDL-002, AGT-002 | Not validated |
 | AC-003 | At least one deliverable is verified by a different provider than its producer, and a seeded flawed deliverable triggers a revision loop. | VER-003, COL-004 | Not validated |
 | AC-004 | A run with a low budget cap halts within the tolerance in OBS-002. | OBS-002 | Not validated |
-| AC-005 | Terminating the worker mid-run does not lose the run or duplicate completed tasks. | NFR-001, EXE-002 | Not validated |
+| AC-005 | Terminating the worker mid-run does not lose the run, create duplicate committed outputs, or cause invalid state transitions. | NFR-001, EXE-002 | Not validated |
 | AC-006 | Cross-tenant access attempts are denied in automated tests. | SEC-002 | Not validated |
 | AC-007 | No provider or model identifier appears in any role definition. | AGT-001 | Not validated |
 | AC-008 | A mobile-initiated commit passes automated checks and deploys to a preview without a local step. | NFR-002 | Not validated |
@@ -421,6 +423,8 @@ None of these has been validated. No implementation exists.
 ## 22. Assumptions and unresolved questions
 
 ### 22.1 Assumptions (all unvalidated)
+
+P0.2 feasibility must be evaluated at the combined-stack level, not service by service. The evaluation must cover persistent background execution, database access, authentication, quotas, resumability and provider access together. A free individual service, temporary credit or user-paid BYOK path is not evidence that the complete MVP architecture can operate within the founder's ₦0 budget.
 
 | ID | Assumption | Impact if false | Validate in |
 |---|---|---|---|
@@ -441,16 +445,16 @@ None of these has been validated. No implementation exists.
 
 | ID | Question | Why it matters | Decision required | Blocks P0.2? | Provisional direction |
 |---|---|---|---|---|---|
-| OQ-001 | Which domain is the MVP reference scenario? | Determines tools, sandbox need and evaluation design. | Choose UC-01, UC-05 or another. | Partly (tool and sandbox scope) | UC-01 research brief. |
-| OQ-002 | Operator-held keys first (BYOK later), or BYOK in the MVP? | Drives credential storage design and security scope. | Founder decision. | Yes (credential architecture) | Operator-held keys for MVP. |
-| OQ-003 | Which two providers for the MVP? | Adapter work and budget. | Select after ASM-007 check. | No | Decide in P0.2. |
-| OQ-004 | What is the monthly infrastructure and model-spend ceiling? | NFR-003 and hosting choices depend on it. | Founder sets numbers. | Yes (hosting ADR) | None; founder input needed. |
+| OQ-001 | Which domain and information mode is the MVP reference scenario? | Determines retrieval, attribution, tool and evaluation scope. | Choose A: sourced research requiring retrieval, or B: planning/synthesis using supplied or otherwise available information. | Partly (tool and sandbox scope) | B is recommended for ₦0 feasibility, not approved. |
+| OQ-002 | Can two genuinely free AI providers support the proposed MVP under ₦0, and what model-access decision follows if they cannot? | Drives credential storage, security, disclosure and MVP-proof feasibility. | P0.2 must evaluate genuinely free provider access; if infeasible, founder decides whether to revise the MVP proof. Paid access must not be introduced silently. | Yes (provider and credential architecture) | BYOK is excluded from the proposed MVP; no free managed-access solution has been validated. |
+| OQ-003 | Which two genuinely free providers, if any, can support the MVP? | Adapter work, quotas, regional access and budget feasibility. | Select only after P0.2 establishes that two providers are genuinely free and suitable; otherwise escalate to the founder's MVP-proof decision. | No | Decide in P0.2; do not assume paid access. |
+| OQ-004 | What is the monthly infrastructure and model-spend ceiling? | NFR-003 and hosting choices depend on it. | **Resolved by founder:** initial platform infrastructure budget ₦0 and initial managed AI/API budget ₦0. | Yes (hosting ADR) | P0.2 must evaluate the complete infrastructure and model-access stack together; individual free tiers do not prove the architecture works at ₦0. |
 | OQ-005 | How is durable long-running execution achieved on low-cost hosting? | NFR-001 and ASM-002. | Architecture decision. | Yes | Evaluate in P0.2. |
 | OQ-006 | Which payment provider works for the founder's jurisdiction and users? | SAAS-004. | Select and validate. | No (P1) | Research before P1. |
 | OQ-007 | Legal posture: data protection, terms, data residency. | SEC-009, SEC-010, SAAS-007. | Obtain legal review. | No (required before public launch) | None. |
-| OQ-008 | What does "full autonomy" permit? Which external-effect actions may ever run without approval? | Defines policy engine and approval gates. | Founder decision. | Partly (security architecture) | Side-effect-free only until A1 gating exists. |
+| OQ-008 | What does "full autonomy" permit? Which external-effect actions may ever run without approval? | Defines policy engine and approval gates. | Founder decision. | Partly (security architecture) | Proposed conservative defaults only: read-only external research; drafting/internal artifacts; no messages, purchases, deployments, account changes or irreversible actions without explicit approval; clear permissions and audit logs. |
 | OQ-009 | Is "Collective" available as a product name, domain and trademark? | Brand risk before launch. | Search and legal check. | No | Check before public launch. |
-| OQ-010 | Does the repository already contain work or conventions? | Reconnaissance was not performed in the drafting session. | Run reconnaissance and record findings. | Yes | Complete before any commit. |
+| OQ-010 | Does the repository already contain work or conventions? | Prevents overwriting existing work. | **Resolved for the published state:** founder's Colab report described the initial empty repository; this session independently verified the published `main` state contains only the four P0.1 documents. The pre-publication state was not independently observed. | No | No application implementation found. |
 
 ### 22.3 Risks
 
@@ -476,3 +480,5 @@ Likelihood and impact are the author's judgement (L, M, H), not measured values.
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-11-18 | First draft produced in P0.1. Not reviewed or approved. |
+| 0.1-remediated | 2026-11-18 | Incorporated founder's ₦0 decision, corrected reconnaissance record, kept OQ-001/OQ-002/OQ-008 open, reviewed P0 scope (56 retained; MDL-003 and MDL-007 moved to P1), and reconciled at-least-once/idempotency semantics. Pending founder approval. |
+| 0.1-targeted-corrections | 2026-11-18 | Identified MDL-002 as a critical two-provider feasibility dependency, excluded BYOK from the proposed MVP, required combined-stack ₦0 feasibility analysis, and clarified the founder approval gate for P0.2. Pending founder approval. |
